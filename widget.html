@@ -455,9 +455,10 @@ function safeMsg(str) {
 // ── SSN — iframe postMessage + WebSocket (combined) ─────────────
 if (SESSION) {
 
-    // ── Method 1: dock.html iframe → postMessage ─────────────────
+    // ── Method 1: VDO.Ninja iframe → postMessage ─────────────────
+    // VDO.Ninja sends postMessage({ dataReceived: { overlayNinja: data } }) to parent
     var iframe = document.createElement('iframe');
-    iframe.src = 'https://socialstream.ninja/dock.html?session=' + encodeURIComponent(SESSION) + '&hidemenu&transparent';
+    iframe.src = 'https://vdo.socialstream.ninja/?ln&salt=vdo.ninja&password=false&push&label=dock&vd=0&ad=0&novideo&noaudio&autostart&cleanoutput&room=' + encodeURIComponent(SESSION);
     iframe.style.cssText = 'position:fixed;width:1px;height:1px;border:0;opacity:0;pointer-events:none;';
     iframe.allow = 'autoplay; camera; microphone';
     document.body.appendChild(iframe);
