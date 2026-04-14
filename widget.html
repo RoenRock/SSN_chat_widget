@@ -452,11 +452,36 @@ function safeMsg(str) {
     });
 }
 
-// ── SSN — iframe postMessage + WebSocket (combined) ─────────────
-if (SESSION) {
+// ── Message queue — prevents burst flooding ──────────────────────
+// When SSN sends accumulated messages all at once, we space them out.
+var msgQueue   = [];
+var queueBusy  = false;
+var QUEUE_DELAY = 180; // ms between messages in a burst
 
-    // ── Method 1: VDO.Ninja iframe → postMessage ─────────────────
-    // VDO.Ninja sends postMessage({ dataReceived: { overlayNinja: data } }) to parent
+function enqueue(data) {
+    msgQueue.push(data);
+    if (!queueBusy) drainQueue();
+}
+
+function drainQueue() {
+    if (msgQueue.length === 0) { queueBusy = false; return; }
+    queueBusy = true;
+    processSSN(msgQueue.shift());
+    setTimeout(drainQueue, QUEUE_DELAY);
+}
+
+function handleSSNPayload(payload) {
+    if (Array.isArray(payload)) {
+        // Burst of accumulated messages — skip old ones, keep last 5 max
+        var recent = payload.slice(-5);
+        recent.forEach(function(msg) { enqueue(msg); });
+    } else if (payload && typeof payload === 'object') {
+        enqueue(payload);
+    }
+}
+
+// ── SSN — VDO.Ninja iframe postMessage ───────────────────────────
+if (SESSION) {
     var iframe = document.createElement('iframe');
     iframe.src = 'https://vdo.socialstream.ninja/?ln&salt=vdo.ninja&password=false&push&label=dock&vd=0&ad=0&novideo&noaudio&autostart&cleanoutput&room=' + encodeURIComponent(SESSION);
     iframe.style.cssText = 'position:fixed;width:1px;height:1px;border:0;opacity:0;pointer-events:none;';
@@ -465,41 +490,12 @@ if (SESSION) {
 
     window.addEventListener('message', function(e) {
         try {
-            console.log('[SSN postMsg]', e.origin, typeof e.data, JSON.stringify(e.data).substring(0, 200));
             var d = (typeof e.data === 'string') ? JSON.parse(e.data) : e.data;
             if (d && d.dataReceived && d.dataReceived.overlayNinja) {
-                processSSN(d.dataReceived.overlayNinja);
+                handleSSNPayload(d.dataReceived.overlayNinja);
             }
         } catch(err) {}
     });
-
-    // ── Method 2: WebSocket relay ────────────────────────────────
-    var socket;
-    var retryDelay = 2000;
-
-    function connect() {
-        socket = new WebSocket('wss://io.socialstream.ninja');
-        socket.onopen = function() {
-            retryDelay = 2000;
-            socket.send(JSON.stringify({ join: SESSION, out: 3, in: 2 }));
-            console.log('[SSN] ws connected, joined:', SESSION);
-        };
-        socket.onmessage = function(event) {
-            try {
-                var data = JSON.parse(event.data);
-                console.log('[SSN ws msg]', JSON.stringify(data).substring(0, 200));
-                var msg = data.contents || data;
-                if (msg && (msg.chatname || msg.chatmessage)) processSSN(msg);
-            } catch(e) {}
-        };
-        socket.onclose = function() {
-            setTimeout(connect, retryDelay);
-            retryDelay = Math.min(retryDelay * 1.5, 30000);
-        };
-        socket.onerror = function() { socket.close(); };
-    }
-
-    connect();
 }
 
 // ── SSN message processor ────────────────────────────────────────
