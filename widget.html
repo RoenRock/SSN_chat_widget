@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vaporwave Chat — LoKyo × Social Stream Ninja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* =====================================================
+   Vaporwave Chat — SSN Edition  (LoKyo)
+   URL params:
+     session=ID        — Social Stream Ninja session (required)
+     layout=stack      — stack | ticker | float | skew
+     align=left        — left | right
+     accent=FF71CE     — hex without #
+     accent2=01CDFE    — hex without #
+     text=E0D0FF       — hex without #
+     blur=20           — px (0–40)
+     zoom=1            — scale
+     autofade=0        — seconds (0 = off)
+===================================================== */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --vapor-bg:       linear-gradient(135deg, rgba(255,113,206,0.10), rgba(1,205,254,0.10));
+    --vapor-alert-bg: linear-gradient(135deg, rgba(255,113,206,0.14), rgba(185,103,255,0.10), rgba(1,205,254,0.10));
+    --vapor-border:   rgba(255,113,206,0.18);
+    --accent:  #FF71CE;
+    --accent2: #01CDFE;
+    --text:    #E0D0FF;
+    --blur:    20px;
+    --float-dur: 14s;
+}
+
+html, body { margin: 0; padding: 0; overflow: hidden; height: 100%; }
+body { background: transparent; font-family: 'Inter', sans-serif; }
+
+/* ===================== */
+/*   STACK (default)     */
+/* ===================== */
+
+#chat-container {
+    position: fixed;
+    bottom: 20px; left: 20px; right: 20px;
+    max-width: 800px;
+    height: calc(100vh - 40px);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    gap: 8px; overflow: hidden;
+    padding: 8px 22px 8px 2px;
+}
+
+#chat-container.align-right { left: auto; align-items: flex-end; padding: 8px 2px 8px 22px; }
+
+.chat-card, .alert-card      { transform-origin: left center; }
+.align-right .chat-card,
+.align-right .alert-card     { transform-origin: right center; }
+
+/* ===================== */
+/*   TICKER              */
+/* ===================== */
+
+#chat-container.mode-ticker {
+    bottom: 50px; left: 0; right: 0; max-width: 100%; height: 72px;
+    gap: 12px; padding: 0 24px; overflow: hidden;
+    flex-direction: row-reverse; justify-content: flex-start; align-items: center;
+}
+.mode-ticker .chat-card,
+.mode-ticker .alert-card {
+    white-space: nowrap; max-width: none; flex-shrink: 0;
+    flex-wrap: nowrap; transform-origin: center center;
+    clip-path: none;
+    animation: tickerCardIn 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.mode-ticker .alert-sub-text { display: none; }
+
+@keyframes tickerCardIn {
+    0%   { opacity: 0; transform: translateX(60px) scale(0.65); }
+    55%  { opacity: 1; transform: translateX(-6px)  scale(1.06); }
+    80%  {             transform: translateX(3px)   scale(0.97); }
+    100% { opacity: 1; transform: translateX(0)     scale(1); }
+}
+
+/* ===================== */
+/*   FLOAT               */
+/* ===================== */
+
+#chat-container.mode-float {
+    position: fixed; inset: 0; max-width: 100%; height: 100vh;
+    overflow: visible; padding: 0; gap: 0;
+    justify-content: flex-start; align-items: flex-start; pointer-events: none;
+}
+.mode-float .chat-card,
+.mode-float .alert-card {
+    position: absolute; transform-origin: center center;
+    clip-path: none;
+    animation: floatDrift var(--float-dur, 14s) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes floatDrift {
+    0%   { opacity: 0;   transform: translateY(0)      scale(0.85); }
+    5%   { opacity: 1;   transform: translateY(-15px)   scale(1.03); }
+    10%  { opacity: 1;   transform: translateY(-30px)   scale(1); }
+    65%  { opacity: 1;   transform: translateY(-50vh); }
+    85%  { opacity: 0.5; transform: translateY(-80vh); }
+    100% { opacity: 0;   transform: translateY(-100vh); }
+}
+
+/* ===================== */
+/*   SKEW                */
+/* ===================== */
+
+#chat-container.mode-skew {
+    bottom: 20px; left: 20px; right: 20px; max-width: 800px;
+    height: calc(100vh - 40px); overflow: hidden;
+    justify-content: flex-end; gap: 10px; padding: 12px 24px 28px 0;
+}
+#chat-container.mode-skew.align-right { left: auto; align-items: flex-end; padding: 12px 0 28px 24px; }
+
+.mode-skew > *:nth-child(7n+1) { --rot: -4.5deg; }
+.mode-skew > *:nth-child(7n+2) { --rot:  2.5deg; }
+.mode-skew > *:nth-child(7n+3) { --rot: -1.5deg; }
+.mode-skew > *:nth-child(7n+4) { --rot:  4deg; }
+.mode-skew > *:nth-child(7n+5) { --rot: -3deg; }
+.mode-skew > *:nth-child(7n+6) { --rot:  1.5deg; }
+.mode-skew > *:nth-child(7n+7) { --rot: -2.5deg; }
+
+.mode-skew .chat-card,
+.mode-skew .alert-card {
+    --rot: -3deg; transform-origin: left center;
+    animation: skewBounceIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.mode-skew.align-right .chat-card,
+.mode-skew.align-right .alert-card { transform-origin: right center; }
+
+@keyframes skewBounceIn {
+    0%   { opacity: 0; transform: rotate(var(--rot)) scale(0.75); }
+    60%  { opacity: 1; transform: rotate(var(--rot)) scale(1.07); }
+    80%  {             transform: rotate(var(--rot)) scale(0.97); }
+    100% { opacity: 1; transform: rotate(var(--rot)) scale(1); }
+}
+
+/* ===================== */
+/*   CHAT CARDS          */
+/* ===================== */
+
+.chat-card {
+    display: flex; align-items: baseline; flex-wrap: wrap;
+    column-gap: 9px; row-gap: 4px; padding: 11px 18px;
+    background: var(--vapor-bg);
+    backdrop-filter: blur(var(--blur)) saturate(1.3) brightness(1.05);
+    -webkit-backdrop-filter: blur(var(--blur)) saturate(1.3) brightness(1.05);
+    border: 1px solid var(--vapor-border);
+    border-bottom: none;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 5px), 0 100%);
+    width: fit-content; max-width: min(480px,100%); flex-shrink: 0;
+    animation: vaporSlideIn 0.45s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+.user-tag { display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; }
+
+/* Platform badge */
+.platform-label {
+    font-family: 'Audiowide', sans-serif;
+    font-size: 9px; font-weight: 400; letter-spacing: 0.10em; text-transform: uppercase;
+    padding: 1px 7px; border-radius: 3px;
+    background: rgba(255,255,255,0.06); line-height: 1.6;
+    color: var(--accent2);
+}
+.platform-twitch    { color: #9146FF; }
+.platform-youtube   { color: #FF4444; }
+.platform-kick      { color: #53FC18; }
+.platform-tiktok    { color: #69C9D0; }
+.platform-instagram { color: #E1306C; }
+.platform-facebook  { color: #4D90FE; }
+
+.chat-username {
+    font-family: 'Audiowide', sans-serif;
+    font-size: 13.5px; font-weight: 400; color: var(--accent); white-space: nowrap;
+}
+.msg-sep   { font-size: 13px; color: rgba(255,255,255,0.18); flex-shrink: 0; align-self: center; }
+.chat-text { font-size: 14px; font-weight: 400; color: var(--text); line-height: 1.45; word-break: break-word; min-width: 0; }
+.chat-emote { height: 22px; width: auto; vertical-align: middle; margin: 0 2px; }
+
+/* ===================== */
+/*   ALERT CARDS         */
+/* ===================== */
+
+.alert-card {
+    position: relative; overflow: hidden;
+    padding: 10px 18px;
+    background: var(--vapor-alert-bg);
+    backdrop-filter: blur(var(--blur)) saturate(1.3) brightness(1.05);
+    -webkit-backdrop-filter: blur(var(--blur)) saturate(1.3) brightness(1.05);
+    border: 1px solid rgba(255,113,206,0.22);
+    border-left: 3px solid;
+    border-image: linear-gradient(to bottom, var(--accent), var(--accent2)) 1;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 5px), 0 100%);
+    width: fit-content; max-width: min(520px,100%); flex-shrink: 0;
+    display: flex; flex-direction: column; gap: 5px;
+    animation: vaporAlertIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+.alert-header   { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
+.alert-type-tag {
+    font-family: 'Audiowide', sans-serif;
+    font-size: 9px; font-weight: 400; letter-spacing: 0.10em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 3px;
+    background: linear-gradient(90deg, rgba(255,113,206,0.15), rgba(1,205,254,0.15));
+    flex-shrink: 0;
+}
+.alert-type-tag .tag-text {
+    background: linear-gradient(90deg, #FF71CE, #B967FF, #01CDFE);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.alert-username     { font-size: 14.5px; font-weight: 700; color: var(--text); }
+.alert-amount       {
+    font-family: 'Audiowide', sans-serif;
+    font-size: 14px; font-weight: 400; white-space: nowrap; padding-left: 4px;
+    background: linear-gradient(90deg, #FF71CE, #01CDFE);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.alert-amount-label { font-size: 11px; opacity: 0.6; }
+.alert-sub-text     { font-size: 12px; color: rgba(255,255,255,0.40); line-height: 1.4; word-break: break-word; }
+
+/* Chrome shimmer */
+.alert-card::before {
+    content: '';
+    position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+    animation: chromeSwipe 4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+/* ===================== */
+/*   ANIMATIONS          */
+/* ===================== */
+
+@keyframes vaporSlideIn {
+    0%   { opacity: 0; transform: translateX(-20px) scale(0.92); }
+    60%  { opacity: 1; transform: translateX(4px) scale(1.02); }
+    100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+@keyframes vaporAlertIn {
+    0%   { opacity: 0; transform: translateX(-30px) scale(0.88); }
+    55%  { opacity: 1; transform: translateX(5px) scale(1.03); }
+    80%  { transform: translateX(-2px) scale(0.99); }
+    100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+@keyframes chromeSwipe {
+    0%, 100% { left: -100%; }
+    50%      { left: 200%; }
+}
+@keyframes fadeOutCard {
+    0%   { opacity: 1; max-height: 200px; margin-bottom: 8px; }
+    70%  { opacity: 1; }
+    100% { opacity: 0; max-height: 0; margin-bottom: 0; padding: 0; border-width: 0; }
+}
+.card-fade-out { animation: fadeOutCard 0.7s ease-out forwards; overflow: hidden; pointer-events: none; }
+
+/* ===================== */
+/*   NO SESSION WARNING  */
+/* ===================== */
+
+#no-session {
+    position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-family: 'Audiowide', sans-serif; font-size: 13px; color: rgba(255,113,206,0.7);
+    letter-spacing: 0.08em; text-align: center; padding: 20px;
+}
+</style>
+</head>
+<body>
+<div id="chat-container"></div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────
+//  Vaporwave Chat — Social Stream Ninja Edition  (LoKyo)
+//  Usage: widget.html?session=YOUR_SESSION_ID&layout=stack&...
+// ─────────────────────────────────────────────────────────────────
+
+var params     = new URLSearchParams(location.search);
+var SESSION    = params.get('session') || '';
+var layoutMode = params.get('layout')  || 'stack';
+var chatAlign  = params.get('align')   || 'left';
+var autoFadeSec = parseInt(params.get('autofade') || '0');
+
+var container = document.getElementById('chat-container');
+
+// ── No session guard ────────────────────────────────────────────
+if (!SESSION) {
+    var warn = document.createElement('div');
+    warn.id = 'no-session';
+    warn.textContent = 'Add ?session=YOUR_SESSION_ID to the URL';
+    document.body.appendChild(warn);
+}
+
+// ── Layout ──────────────────────────────────────────────────────
+(function initLayout() {
+    if (layoutMode === 'ticker') container.classList.add('mode-ticker');
+    else if (layoutMode === 'float') container.classList.add('mode-float');
+    else if (layoutMode === 'skew') {
+        container.classList.add('mode-skew');
+        if (chatAlign === 'right') container.classList.add('align-right');
+    } else {
+        if (chatAlign === 'right') container.classList.add('align-right');
+    }
+})();
+
+// ── Colors & settings ───────────────────────────────────────────
+(function initSettings() {
+    var accent  = params.get('accent')  ? '#' + params.get('accent')  : '#FF71CE';
+    var accent2 = params.get('accent2') ? '#' + params.get('accent2') : '#01CDFE';
+    var text    = params.get('text')    ? '#' + params.get('text')    : '#E0D0FF';
+    var blur    = params.get('blur')    ? params.get('blur') + 'px'   : '20px';
+    var zoom    = params.get('zoom')    || '1';
+    var floatSec = parseInt(params.get('floatdur') || '14');
+
+    var root = document.documentElement;
+    root.style.setProperty('--accent',    accent);
+    root.style.setProperty('--accent2',   accent2);
+    root.style.setProperty('--text',      text);
+    root.style.setProperty('--blur',      blur);
+    root.style.setProperty('--float-dur', floatSec + 's');
+    document.body.style.zoom = zoom;
+})();
+
+// ── DOM helpers ─────────────────────────────────────────────────
+function trimMessages() {
+    if (layoutMode === 'ticker' || layoutMode === 'float') return;
+    while (container.children.length > 50) container.removeChild(container.children[0]);
+}
+
+function scheduleAutoFade(el) {
+    if (!autoFadeSec || layoutMode !== 'stack') return;
+    setTimeout(function() {
+        el.classList.add('card-fade-out');
+        setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 800);
+    }, autoFadeSec * 1000);
+}
+
+function addCardToDOM(card, isAlert) {
+    if (layoutMode === 'ticker') {
+        if (container.firstChild) container.insertBefore(card, container.firstChild);
+        else container.appendChild(card);
+        setTimeout(function() {
+            var items = container.children;
+            for (var i = items.length - 1; i >= 0; i--) {
+                if (items[i].getBoundingClientRect().right < 0) container.removeChild(items[i]);
+            }
+        }, 800);
+    } else if (layoutMode === 'float') {
+        var dur = (parseFloat(document.documentElement.style.getPropertyValue('--float-dur')) || 14) * 1000;
+        card.style.left   = ((isAlert ? 20 : 5) + Math.random() * (isAlert ? 40 : 70)) + 'vw';
+        card.style.bottom = (40 + Math.random() * 120) + 'px';
+        container.appendChild(card);
+        setTimeout(function() { if (card.parentNode) card.parentNode.removeChild(card); }, dur + 200);
+        if (container.children.length > 10) {
+            var oldest = container.children[0];
+            oldest.classList.add('card-fade-out');
+            (function(el) { setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 800); })(oldest);
+        }
+    } else {
+        container.appendChild(card);
+        trimMessages();
+        scheduleAutoFade(card);
+    }
+}
+
+// ── Platform badge ───────────────────────────────────────────────
+var PLATFORM_LABELS = {
+    twitch: 'TW', youtube: 'YT', kick: 'KICK',
+    tiktok: 'TT', instagram: 'IG', facebook: 'FB',
+    twitter: 'X', x: 'X', trovo: 'TR', dlive: 'DL'
+};
+
+function platformHTML(platform) {
+    if (!platform) return '';
+    var key   = platform.toLowerCase();
+    var label = PLATFORM_LABELS[key] || platform.substring(0, 3).toUpperCase();
+    return '<span class="platform-label platform-' + key + '">' + label + '</span>';
+}
+
+// ── Chat message ────────────────────────────────────────────────
+function addChatMessage(username, message, platform) {
+    var card = document.createElement('div');
+    card.className = 'chat-card';
+    card.innerHTML =
+        '<span class="user-tag">' +
+            platformHTML(platform) +
+            '<span class="chat-username">' + escName(username) + '</span>' +
+        '</span>' +
+        '<span class="msg-sep">//</span>' +
+        '<span class="chat-text">' + safeMsg(message) + '</span>';
+    addCardToDOM(card, false);
+}
+
+// ── Alert ────────────────────────────────────────────────────────
+function addAlert(typeTag, username, amount, amountLabel, subMessage) {
+    var amountHTML = amount
+        ? '<span class="alert-amount">' + escName(String(amount)) +
+          (amountLabel ? ' <span class="alert-amount-label">' + amountLabel + '</span>' : '') +
+          '</span>' : '';
+    var subHTML = subMessage && String(subMessage).trim()
+        ? '<div class="alert-sub-text">' + escName(String(subMessage)) + '</div>' : '';
+    var card = document.createElement('div');
+    card.className = 'alert-card';
+    card.innerHTML =
+        '<div class="alert-header">' +
+            '<span class="alert-type-tag"><span class="tag-text">' + escName(typeTag) + '</span></span>' +
+            '<span class="alert-username">' + escName(username) + '</span>' +
+            amountHTML +
+        '</div>' + subHTML;
+    addCardToDOM(card, true);
+}
+
+function addFollowAlert(u)             { addAlert('FOLLOW',  u, '', '', ''); }
+function addSubAlert(u)                { addAlert('NEW SUB', u, '', '', ''); }
+function addResubAlert(u, months)      { addAlert('RESUB',   u, 'x' + months, 'mo', ''); }
+function addTipsAlert(u, amount, msg)  { addAlert('TIP',     u, amount, '', msg); }
+function addBitsAlert(u, amount, msg)  { addAlert('CHEER',   u, amount, 'bits', msg); }
+function addGiftsAlert(u, amount, msg) { addAlert('GIFT',    u, amount, 'subs', msg); }
+function addRaidAlert(u, viewers)      { addAlert('RAID',    u, viewers, 'viewers', ''); }
+
+// ── Safety helpers ───────────────────────────────────────────────
+function escName(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+// SSN sends emote images inside chatmessage — allow <img> tags only
+function safeMsg(str) {
+    // Strip everything except <img> tags from known CDNs
+    return String(str).replace(/<(?!img\s)[^>]+>/gi, function(tag) {
+        return escName(tag);
+    }).replace(/<img\s([^>]*)>/gi, function(full, attrs) {
+        var src = (attrs.match(/src=["']([^"']+)["']/) || [])[1] || '';
+        var alt = (attrs.match(/alt=["']([^"']+)["']/) || [])[1] || '';
+        var safeDomains = [
+            'static-cdn.jtvnw.net', 'cdn.betterttv.net',
+            'cdn.frankerfacez.com', 'cdn.7tv.app',
+            'yt3.ggpht.com', 'static.twitchcdn.net',
+            'p16-sign.tiktokcdn', 'emoji.slack-edge.com'
+        ];
+        var allowed = safeDomains.some(function(d) { return src.indexOf(d) !== -1; });
+        if (allowed) return '<img class="chat-emote" src="' + escName(src) + '" alt="' + escName(alt) + '">';
+        return escName(full);
+    });
+}
+
+// ── SSN WebSocket ────────────────────────────────────────────────
+if (SESSION) {
+    var socket;
+    var retryDelay = 2000;
+
+    function connect() {
+        socket = new WebSocket('wss://io.socialstream.ninja');
+
+        socket.onopen = function() {
+            retryDelay = 2000;
+            // No in/out filter — receive everything in the room
+            socket.send(JSON.stringify({ join: SESSION }));
+            console.log('[SSN] connected, joined:', SESSION);
+        };
+
+        socket.onmessage = function(event) {
+            try {
+                var data = JSON.parse(event.data);
+                console.log('[SSN raw]', JSON.stringify(data).substring(0, 200));
+                var msg = data.contents || data;
+                if (msg && (msg.chatname || msg.chatmessage)) processSSN(msg);
+            } catch(e) { console.error('[SSN error]', e); }
+        };
+
+        socket.onclose = function() {
+            setTimeout(connect, retryDelay);
+            retryDelay = Math.min(retryDelay * 1.5, 30000);
+        };
+
+        socket.onerror = function(e) { socket.close(); };
+    }
+
+    connect();
+}
+
+// ── SSN message processor ────────────────────────────────────────
+// data.type     = platform (twitch / youtube / kick / tiktok …)
+// data.event    = event type for alerts (follow / subscription / raid …)
+// data.chatname = username
+// data.chatmessage = message text (may include <img> emotes)
+function processSSN(data) {
+    var name     = data.chatname    || data.name    || 'Unknown';
+    var message  = data.chatmessage || data.message || '';
+    var event    = (data.event      || '').toLowerCase();
+    var platform = (data.type       || '').toLowerCase();
+    var donation = data.hasDonation || '';
+    var viewers  = data.viewers     || data.viewercount || '';
+    var months   = parseInt(data.months || data.membership || '0');
+
+    // ── Alerts ──
+    if (event === 'follow' || event === 'follower') {
+        addFollowAlert(name);
+        return;
+    }
+    if (event === 'subscription' || event === 'subscriber' || event === 'member') {
+        if (months > 1) addResubAlert(name, months);
+        else addSubAlert(name);
+        return;
+    }
+    if (event === 'raid' || event === 'host') {
+        addRaidAlert(name, viewers);
+        return;
+    }
+    if (event === 'bits' || event === 'cheer') {
+        addBitsAlert(name, data.amount || '', message);
+        return;
+    }
+    if (event === 'gifted' || event === 'giftedsubscription') {
+        addGiftsAlert(name, data.amount || '', message);
+        return;
+    }
+    if (donation) {
+        addTipsAlert(name, donation, message);
+        return;
+    }
+
+    // ── Regular chat ──
+    if (name && message) {
+        addChatMessage(name, message, platform);
+    }
+}
+</script>
+</body>
+</html>
