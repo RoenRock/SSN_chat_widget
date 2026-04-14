@@ -452,36 +452,50 @@ function safeMsg(str) {
     });
 }
 
-// ── SSN WebSocket ────────────────────────────────────────────────
+// ── SSN — iframe postMessage + WebSocket (combined) ─────────────
 if (SESSION) {
+
+    // ── Method 1: dock.html iframe → postMessage ─────────────────
+    var iframe = document.createElement('iframe');
+    iframe.src = 'https://socialstream.ninja/dock.html?session=' + encodeURIComponent(SESSION) + '&hidemenu&transparent';
+    iframe.style.cssText = 'position:fixed;width:1px;height:1px;border:0;opacity:0;pointer-events:none;';
+    iframe.allow = 'autoplay; camera; microphone';
+    document.body.appendChild(iframe);
+
+    window.addEventListener('message', function(e) {
+        try {
+            console.log('[SSN postMsg]', e.origin, typeof e.data, JSON.stringify(e.data).substring(0, 200));
+            var d = (typeof e.data === 'string') ? JSON.parse(e.data) : e.data;
+            if (d && d.dataReceived && d.dataReceived.overlayNinja) {
+                processSSN(d.dataReceived.overlayNinja);
+            }
+        } catch(err) {}
+    });
+
+    // ── Method 2: WebSocket relay ────────────────────────────────
     var socket;
     var retryDelay = 2000;
 
     function connect() {
         socket = new WebSocket('wss://io.socialstream.ninja');
-
         socket.onopen = function() {
             retryDelay = 2000;
-            // No in/out filter — receive everything in the room
-            socket.send(JSON.stringify({ join: SESSION }));
-            console.log('[SSN] connected, joined:', SESSION);
+            socket.send(JSON.stringify({ join: SESSION, out: 3, in: 2 }));
+            console.log('[SSN] ws connected, joined:', SESSION);
         };
-
         socket.onmessage = function(event) {
             try {
                 var data = JSON.parse(event.data);
-                console.log('[SSN raw]', JSON.stringify(data).substring(0, 200));
+                console.log('[SSN ws msg]', JSON.stringify(data).substring(0, 200));
                 var msg = data.contents || data;
                 if (msg && (msg.chatname || msg.chatmessage)) processSSN(msg);
-            } catch(e) { console.error('[SSN error]', e); }
+            } catch(e) {}
         };
-
         socket.onclose = function() {
             setTimeout(connect, retryDelay);
             retryDelay = Math.min(retryDelay * 1.5, 30000);
         };
-
-        socket.onerror = function(e) { socket.close(); };
+        socket.onerror = function() { socket.close(); };
     }
 
     connect();
