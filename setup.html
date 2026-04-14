@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vaporwave Chat — Setup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --accent:  #FF71CE;
+    --accent2: #01CDFE;
+    --purple:  #B967FF;
+    --bg:      #0D0B1A;
+    --surface: rgba(255,255,255,0.04);
+    --border:  rgba(255,113,206,0.15);
+    --text:    #E0D0FF;
+    --muted:   rgba(224,208,255,0.45);
+}
+
+html, body {
+    min-height: 100vh;
+    background: var(--bg);
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+}
+
+body {
+    background-image:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(185,103,255,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(1,205,254,0.07) 0%, transparent 60%);
+    padding: 40px 20px 80px;
+}
+
+/* ── Header ── */
+.header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+.logo {
+    font-family: 'Audiowide', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+.title {
+    font-family: 'Audiowide', sans-serif;
+    font-size: clamp(22px, 4vw, 32px);
+    background: linear-gradient(90deg, var(--accent), var(--purple), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.3;
+    margin-bottom: 10px;
+}
+.subtitle {
+    font-size: 14px;
+    color: var(--muted);
+}
+
+/* ── Card ── */
+.card {
+    max-width: 560px;
+    margin: 0 auto 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 28px;
+    backdrop-filter: blur(12px);
+}
+.card-title {
+    font-family: 'Audiowide', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+/* ── Fields ── */
+.field { margin-bottom: 18px; }
+.field:last-child { margin-bottom: 0; }
+
+label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 7px;
+    letter-spacing: 0.03em;
+}
+
+input[type="text"],
+select {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,113,206,0.2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+}
+input[type="text"]:focus,
+select:focus { border-color: var(--accent); }
+input[type="text"]::placeholder { color: rgba(224,208,255,0.25); }
+
+select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23FF71CE' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    cursor: pointer;
+}
+select option { background: #1a1030; color: var(--text); }
+
+/* Color row */
+.color-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+}
+
+.color-field label { margin-bottom: 7px; }
+.color-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,113,206,0.2);
+    border-radius: 8px;
+    padding: 6px 10px;
+    transition: border-color 0.2s;
+}
+.color-input-wrap:focus-within { border-color: var(--accent); }
+
+input[type="color"] {
+    width: 24px; height: 24px;
+    border: none; outline: none;
+    background: none; padding: 0;
+    cursor: pointer; border-radius: 4px;
+    flex-shrink: 0;
+}
+.color-hex {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    outline: none;
+    width: 0;
+    min-width: 0;
+}
+
+/* Toggle row */
+.toggle-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* Range */
+input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+    cursor: pointer;
+    margin-top: 4px;
+}
+.range-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+}
+
+/* ── Step badge ── */
+.step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    font-family: 'Audiowide', sans-serif;
+    font-size: 10px;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+/* ── How-to ── */
+.howto {
+    max-width: 560px;
+    margin: 0 auto 24px;
+}
+.howto-step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.howto-step:last-child { border-bottom: none; }
+.howto-text { font-size: 13px; line-height: 1.55; color: var(--muted); }
+.howto-text strong { color: var(--text); }
+
+/* ── Generate button ── */
+.btn-generate {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(90deg, rgba(255,113,206,0.15), rgba(1,205,254,0.10));
+    border: 1px solid rgba(255,113,206,0.35);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Audiowide', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+}
+.btn-generate:hover {
+    border-color: var(--accent);
+    background: linear-gradient(90deg, rgba(255,113,206,0.22), rgba(1,205,254,0.14));
+}
+
+/* ── Result ── */
+.result {
+    max-width: 560px;
+    margin: 0 auto;
+    display: none;
+}
+.result.visible { display: block; }
+
+.result-url {
+    background: rgba(1,205,254,0.05);
+    border: 1px solid rgba(1,205,254,0.2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--accent2);
+    word-break: break-all;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    font-family: 'Inter', monospace;
+}
+
+.result-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.btn-copy, .btn-preview {
+    padding: 12px;
+    border-radius: 8px;
+    font-family: 'Audiowide', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid;
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+.btn-copy {
+    background: rgba(255,113,206,0.12);
+    border-color: rgba(255,113,206,0.3);
+    color: var(--accent);
+}
+.btn-copy:hover { background: rgba(255,113,206,0.2); border-color: var(--accent); }
+.btn-copy.copied { background: rgba(5,255,161,0.1); border-color: #05FFA1; color: #05FFA1; }
+
+.btn-preview {
+    background: rgba(1,205,254,0.08);
+    border-color: rgba(1,205,254,0.25);
+    color: var(--accent2);
+}
+.btn-preview:hover { background: rgba(1,205,254,0.15); border-color: var(--accent2); }
+
+/* ── SSN note ── */
+.ssn-note {
+    max-width: 560px;
+    margin: 0 auto 24px;
+    background: rgba(255,113,206,0.05);
+    border: 1px solid rgba(255,113,206,0.12);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+}
+.ssn-note a {
+    color: var(--accent);
+    text-decoration: none;
+}
+.ssn-note a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="header">
+    <div class="logo">LoKyo Widgets</div>
+    <div class="title">Vaporwave Chat</div>
+    <div class="subtitle">Multi-platform overlay · Social Stream Ninja</div>
+</div>
+
+<!-- How-to -->
+<div class="howto">
+    <div class="howto-step">
+        <span class="step">1</span>
+        <div class="howto-text">
+            <strong>Install Social Stream Ninja</strong> browser extension in Chrome and enable it.
+            <br>Then open a stream and <strong>pop out the chat</strong> into a separate window.
+        </div>
+    </div>
+    <div class="howto-step">
+        <span class="step">2</span>
+        <div class="howto-text">
+            Click the SSN extension icon — copy your <strong>Session ID</strong> from the dock URL.
+            <br>It looks like: <span style="color:var(--accent2);font-size:12px;">dock.html?session=<strong>ruZXRYDT2x</strong>&amp;v=…</span>
+        </div>
+    </div>
+    <div class="howto-step">
+        <span class="step">3</span>
+        <div class="howto-text">
+            Paste your Session ID below, adjust the style, and <strong>copy the OBS URL</strong>.
+            <br>Add it as a <strong>Browser Source</strong> in OBS — done.
+        </div>
+    </div>
+</div>
+
+<!-- SSN note -->
+<div class="ssn-note">
+    Don't have Social Stream Ninja?
+    <a href="https://socialstream.ninja" target="_blank">socialstream.ninja</a> —
+    free Chrome extension that merges Twitch, YouTube, Kick, TikTok and more into one chat feed.
+</div>
+
+<!-- Config card -->
+<div class="card">
+    <div class="card-title">Session</div>
+    <div class="field">
+        <label>Social Stream Ninja — Session ID</label>
+        <input type="text" id="session" placeholder="e.g. ruZXRYDT2x" autocomplete="off" spellcheck="false">
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-title">Layout</div>
+    <div class="toggle-row">
+        <div class="field">
+            <label>Display Mode</label>
+            <select id="layout">
+                <option value="stack">Stack (default)</option>
+                <option value="ticker">Ticker (scroll)</option>
+                <option value="float">Float (drift up)</option>
+                <option value="skew">Skew (scattered)</option>
+            </select>
+        </div>
+        <div class="field">
+            <label>Alignment</label>
+            <select id="align">
+                <option value="left">Left</option>
+                <option value="right">Right</option>
+            </select>
+        </div>
+    </div>
+    <div class="field">
+        <label>Zoom / Scale — <span id="zoomVal">1.0</span>×</label>
+        <input type="range" id="zoom" min="0.4" max="2.0" step="0.05" value="1.0"
+               oninput="document.getElementById('zoomVal').textContent = parseFloat(this.value).toFixed(2)">
+        <div class="range-labels"><span>0.4×</span><span>2.0×</span></div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-title">Colors</div>
+    <div class="color-row">
+        <div class="color-field field">
+            <label>Accent (pink)</label>
+            <div class="color-input-wrap">
+                <input type="color" id="accentPicker" value="#FF71CE"
+                       oninput="syncColor('accent', this.value)">
+                <input type="text" class="color-hex" id="accentHex" value="#FF71CE" maxlength="7"
+                       oninput="syncColorFromHex('accent', this.value)">
+            </div>
+        </div>
+        <div class="color-field field">
+            <label>Accent 2 (cyan)</label>
+            <div class="color-input-wrap">
+                <input type="color" id="accent2Picker" value="#01CDFE"
+                       oninput="syncColor('accent2', this.value)">
+                <input type="text" class="color-hex" id="accent2Hex" value="#01CDFE" maxlength="7"
+                       oninput="syncColorFromHex('accent2', this.value)">
+            </div>
+        </div>
+        <div class="color-field field">
+            <label>Text color</label>
+            <div class="color-input-wrap">
+                <input type="color" id="textPicker" value="#E0D0FF"
+                       oninput="syncColor('text', this.value)">
+                <input type="text" class="color-hex" id="textHex" value="#E0D0FF" maxlength="7"
+                       oninput="syncColorFromHex('text', this.value)">
+            </div>
+        </div>
+    </div>
+    <div class="field" style="margin-top:14px;">
+        <label>Blur amount — <span id="blurVal">20</span>px</label>
+        <input type="range" id="blur" min="0" max="40" step="2" value="20"
+               oninput="document.getElementById('blurVal').textContent = this.value">
+        <div class="range-labels"><span>0</span><span>40px</span></div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-title">Auto-hide</div>
+    <div class="toggle-row">
+        <div class="field">
+            <label>Mode</label>
+            <select id="autofadeMode">
+                <option value="0">Off</option>
+                <option value="1">On</option>
+            </select>
+        </div>
+        <div class="field">
+            <label>Delay — <span id="fadeVal">30</span>s</label>
+            <input type="range" id="autofade" min="10" max="120" step="5" value="30"
+                   oninput="document.getElementById('fadeVal').textContent = this.value">
+        </div>
+    </div>
+</div>
+
+<div class="card" style="max-width:560px;margin:0 auto 24px;">
+    <button class="btn-generate" onclick="generate()">Generate OBS URL</button>
+</div>
+
+<!-- Result -->
+<div class="result" id="result">
+    <div class="card">
+        <div class="card-title">Your OBS URL</div>
+        <div class="result-url" id="resultUrl"></div>
+        <div class="result-actions">
+            <button class="btn-copy" id="btnCopy" onclick="copyUrl()">Copy URL</button>
+            <a class="btn-preview" id="btnPreview" href="#" target="_blank">Open Preview</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function syncColor(id, hex) {
+    document.getElementById(id + 'Hex').value = hex;
+}
+function syncColorFromHex(id, val) {
+    if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+        document.getElementById(id + 'Picker').value = val;
+    }
+}
+
+function generate() {
+    var session = document.getElementById('session').value.trim();
+    if (!session) {
+        document.getElementById('session').focus();
+        document.getElementById('session').style.borderColor = 'var(--accent)';
+        return;
+    }
+    document.getElementById('session').style.borderColor = '';
+
+    var base = location.href.replace('setup.html', 'widget.html');
+
+    var params = new URLSearchParams();
+    params.set('session', session);
+
+    var layout = document.getElementById('layout').value;
+    if (layout !== 'stack') params.set('layout', layout);
+
+    var align = document.getElementById('align').value;
+    if (align !== 'left') params.set('align', align);
+
+    var zoom = parseFloat(document.getElementById('zoom').value);
+    if (zoom !== 1.0) params.set('zoom', zoom.toFixed(2));
+
+    var accent = document.getElementById('accentHex').value.replace('#', '');
+    if (accent.toUpperCase() !== 'FF71CE') params.set('accent', accent);
+
+    var accent2 = document.getElementById('accent2Hex').value.replace('#', '');
+    if (accent2.toUpperCase() !== '01CDFE') params.set('accent2', accent2);
+
+    var text = document.getElementById('textHex').value.replace('#', '');
+    if (text.toUpperCase() !== 'E0D0FF') params.set('text', text);
+
+    var blur = parseInt(document.getElementById('blur').value);
+    if (blur !== 20) params.set('blur', blur);
+
+    var autofadeMode = document.getElementById('autofadeMode').value;
+    if (autofadeMode === '1') params.set('autofade', document.getElementById('autofade').value);
+
+    var url = base + '?' + params.toString();
+
+    document.getElementById('resultUrl').textContent = url;
+    document.getElementById('btnPreview').href = url;
+
+    var result = document.getElementById('result');
+    result.classList.add('visible');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function copyUrl() {
+    var url = document.getElementById('resultUrl').textContent;
+    navigator.clipboard.writeText(url).then(function() {
+        var btn = document.getElementById('btnCopy');
+        btn.textContent = 'Copied ✓';
+        btn.classList.add('copied');
+        setTimeout(function() {
+            btn.textContent = 'Copy URL';
+            btn.classList.remove('copied');
+        }, 2000);
+    });
+}
+</script>
+</body>
+</html>
